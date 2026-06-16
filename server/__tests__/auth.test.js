@@ -20,7 +20,7 @@ describe('Auth Endpoints', () => {
   const testUser = {
     name: 'Test User',
     email: `test${Date.now()}@flexora.com`,
-    password: 'test123456',
+    password: 'TestPassword123!',
     age: 25,
     gender: 'male',
     height: 175,
@@ -48,7 +48,7 @@ describe('Auth Endpoints', () => {
     });
 
     it('should reject missing name', async () => {
-      const res = await request(app).post('/api/auth/register').send({ email: 'x@x.com', password: '123456' });
+      const res = await request(app).post('/api/auth/register').send({ email: 'x@x.com', password: 'TestPassword123!' });
       expect(res.statusCode).toBe(400);
     });
 
@@ -72,7 +72,7 @@ describe('Auth Endpoints', () => {
     });
 
     it('should reject non-existent email', async () => {
-      const res = await request(app).post('/api/auth/login').send({ email: 'noone@none.com', password: '123456' });
+      const res = await request(app).post('/api/auth/login').send({ email: 'noone@none.com', password: 'TestPassword123!' });
       expect(res.statusCode).toBe(401);
     });
   });

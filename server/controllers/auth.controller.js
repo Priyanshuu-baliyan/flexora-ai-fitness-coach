@@ -16,8 +16,8 @@ const register = async (req, res, next) => {
       return res.status(400).json({ message: 'An account with this email already exists.' });
     }
 
-    // Create user with all profile fields
-    const user = await User.create({ name, email: normalizedEmail, password, age, gender, height, weight, activityLevel, fitnessGoal });
+    // Create user with all profile fields, explicitly setting role to 'user'
+    const user = await User.create({ name, email: normalizedEmail, password, role: 'user', age, gender, height, weight, activityLevel, fitnessGoal });
 
     // Generate JWT
     const token = generateToken(user);

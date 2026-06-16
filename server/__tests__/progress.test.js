@@ -16,7 +16,7 @@ beforeAll(async () => {
   const res = await request(app).post('/api/auth/register').send({
     name: 'Progress Tester',
     email: `progress_test${Date.now()}@flexora.com`,
-    password: 'test123456',
+    password: 'TestPassword123!',
     age: 28, gender: 'male', height: 180, weight: 80,
     activityLevel: 'active', fitnessGoal: 'buildMuscle',
   });

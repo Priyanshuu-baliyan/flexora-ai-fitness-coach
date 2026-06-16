@@ -44,15 +44,17 @@ const connectDB = async () => {
 
     console.log(`MongoDB Connected: ${conn.connection.host}`);
 
-    // Seed default admin user
+    // Seed default admin user and clean up invalid admin accounts
     try {
       const User = require('../models/User');
-      const adminExists = await User.findOne({ role: 'admin' });
-      if (!adminExists) {
+      
+      // Seed default admin user if not exists, or update password if it's the old weak one
+      const adminUser = await User.findOne({ email: 'admin@flexora.com' }).select('+password');
+      if (!adminUser) {
         await User.create({
           name: 'FlexOra Admin',
           email: 'admin@flexora.com',
-          password: 'adminpassword',
+          password: 'FlexOraAdmin#2026!',
           role: 'admin',
           age: 30,
           gender: 'male',
@@ -61,10 +63,26 @@ const connectDB = async () => {
           activityLevel: 'active',
           fitnessGoal: 'maintain'
         });
-        console.log('Seeded default admin user: admin@flexora.com / adminpassword');
+        console.log('Seeded default admin user: admin@flexora.com / FlexOraAdmin#2026!');
+      } else {
+        const isOldPassword = await adminUser.comparePassword('adminpassword');
+        if (isOldPassword) {
+          adminUser.password = 'FlexOraAdmin#2026!';
+          await adminUser.save();
+          console.log('Updated admin user password from weak "adminpassword" to secure "FlexOraAdmin#2026!"');
+        }
+      }
+
+      // Automatically fix any incorrect admin roles (demote any other user with role 'admin' to 'user')
+      const correctionResult = await User.updateMany(
+        { email: { $ne: 'admin@flexora.com' }, role: 'admin' },
+        { $set: { role: 'user' } }
+      );
+      if (correctionResult.modifiedCount > 0) {
+        console.log(`Successfully demoted ${correctionResult.modifiedCount} unauthorized admin user(s) to 'user' role.`);
       }
     } catch (err) {
-      console.error('Failed to seed default admin user:', err.message);
+      console.error('Failed to seed or correct default admin user:', err.message);
     }
 
     mongoose.connection.on('error', (err) => {

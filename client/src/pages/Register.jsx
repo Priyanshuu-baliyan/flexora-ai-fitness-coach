@@ -45,7 +45,12 @@ export default function Register() {
     if (step === 0) {
       if (!form.name.trim()) e.name = 'Name is required';
       if (!form.email.trim()) e.email = 'Email is required';
-      if (form.password.length < 6) e.password = 'Min 6 characters';
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#.])[A-Za-z\d@$!%*?&#.]{8,}$/;
+      if (form.password.length < 8) {
+        e.password = 'Min 8 characters required';
+      } else if (!passwordRegex.test(form.password)) {
+        e.password = 'Password must contain uppercase, lowercase, number, and special character';
+      }
       if (form.password !== form.confirmPassword) e.confirmPassword = 'Passwords do not match';
     }
     if (step === 1) {
