@@ -50,11 +50,12 @@ const connectDB = async () => {
       
       // Seed default admin user if not exists, or update password if it's the old weak one
       const adminUser = await User.findOne({ email: 'admin@flexora.com' }).select('+password');
+      const adminPassword = process.env.ADMIN_PASSWORD || 'FlexOraAdmin#Fallback2026!';
       if (!adminUser) {
         await User.create({
           name: 'FlexOra Admin',
           email: 'admin@flexora.com',
-          password: 'FlexOraAdmin#2026!',
+          password: adminPassword,
           role: 'admin',
           age: 30,
           gender: 'male',
@@ -63,13 +64,13 @@ const connectDB = async () => {
           activityLevel: 'active',
           fitnessGoal: 'maintain'
         });
-        console.log('Seeded default admin user: admin@flexora.com / FlexOraAdmin#2026!');
+        console.log('Seeded default admin user: admin@flexora.com / [using ADMIN_PASSWORD from environment]');
       } else {
         const isOldPassword = await adminUser.comparePassword('adminpassword');
         if (isOldPassword) {
-          adminUser.password = 'FlexOraAdmin#2026!';
+          adminUser.password = adminPassword;
           await adminUser.save();
-          console.log('Updated admin user password from weak "adminpassword" to secure "FlexOraAdmin#2026!"');
+          console.log('Updated admin user password from weak "adminpassword" to secure environment-configured password.');
         }
       }
 
